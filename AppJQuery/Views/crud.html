@@ -1,0 +1,103 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+
+    <form id="meuForm" method="get" action="Pagina.html">
+        <div>
+            <label for="txtNome">Nome</label>
+            <input type="text" id="txtNome" name="txtNome" />
+        </div>
+
+        <div>
+            <label for="txtEndereco">Endereço</label>
+            <input type="text" id="txtEndereco" name="txtEndereco" />
+        </div>
+
+        <div>
+            <label for="txtEmail">E-mail</label>
+            <input type="text" id="txtEmail" name="txtEmail" />
+        </div>
+
+        <div>
+            <label for="txtNascimento">Nascimento</label>
+            <input type="text" id="txtNascimento" name="txtNascimento" />
+        </div>
+
+        <div>
+            <label for="txtPeso">Peso</label>
+            <input type="text" id="txtPeso" name="txtPeso" />
+        </div>
+
+        <div>
+            <button type="submit">Criar</button>
+        </div>
+    </form>
+
+    <script type="text/javascript" src="/assets/js/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery.mask.min.js"></script>
+    <script type="text/javascript">
+        $("#txtNascimento").mask("0000-00-00");
+
+        $("#meuForm").validate({
+            rules: {
+                txtNome: {
+                    required: true,
+                    minlength: 5
+                },
+
+                txtEndereco: {
+                    required: true,
+                    minlength: 5
+                },
+
+                txtEmail: {
+                    required: true,
+                    email: true
+                },
+
+                txtNascimento: {
+                    required: true,
+                    dateISO: true // ;)
+                },
+
+                txtPeso: {
+                    required: true,
+                    number: true,
+                    range: [1, 999]
+                }
+            },
+
+            submitHandler: function (form) {
+
+                // Aqui, tudo está válido!
+                var pessoa = {
+                    Nome: $("#txtNome").val(),
+                    Endereco: $("#txtEndereco").val(),
+                    Email: $("#txtEmail").val(),
+                    Nascimento: $("#txtNascimento").val(),
+                    Peso: $("#txtPeso").val()
+                };
+
+                $.ajax({
+                    url: "/api/Pessoa/Criar",
+                    method: "post",
+                    dataType: "application/json",
+                    cache: false,
+                    data: pessoa,
+                    success: function (dados) {
+                        alert("OK!!!!! :)");
+                    },
+                    error: function () {
+                        alert("Algo deu errado!");
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

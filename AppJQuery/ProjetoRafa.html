@@ -1,0 +1,302 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/assets/css/bootstrap.min.css" />
+    <style>
+        #tabela {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+            #tabela td, #tabela th {
+                border: 1px solid #ddd;
+                padding: 8px;
+            }
+
+        #tabela tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+         #tabela tr:hover {
+            background-color: #ddd;
+        }
+
+        #tabela th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <!--tabela-->
+
+    <div class="container" align="center">
+        <button type="button" id="btnMostrar">Novo.....</button>
+        <table id="tabela">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Nome</th>
+                    <th>Data de Nascimento</th>
+                    <th>E-mail</th>
+                    <th>Editar</th>
+                    <th>Excluir</th>
+                </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+        </table>
+    </div>
+
+    <!-- modal novo -->
+
+    <div class="modal fade" tabindex="-1" role="dialog" id="meuModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 align="center" class="modal-title" id="modalTitle">(:</h4>
+                </div>
+                <form id="meuForm">
+                    <div class="modal-body">
+                        <div align="center">
+                            <div id="divNome">
+                                <label>Nome</label><br>
+                                <input placeholder="Nome" type="text" id="nome" name="nome" />
+                            </div>
+                            <div id="divNasc">
+                                <label>Data de nascimento</label><br>
+                                <input placeholder="Nascimento" type="text" id="nasc" name="nasc" />
+                            </div>
+                            <div id="divEmail">
+                                <label>Email</label><br>
+                                <input placeholder="Email" type="text" id="email" name="email" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="btnSalvar">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- modal excluir -->
+
+    <div class="modal fade" tabindex="-1" role="dialog" id="meuModalExcluir">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 align="center" class="modal-title" id="modalTitle">Atenção!</h4>
+                </div>
+                <div class="modal-body">
+                    <span>Certeza que deseja Excluir?</span>
+               </div>
+               <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="excluirModal">Excluir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script type="text/javascript" src="/assets/js/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery.mask.min.js"></script>
+    <script type="text/javascript">
+
+        //Criando variáves global para usar em todas partes do projeto
+        var btnMostrar = document.getElementById("btnMostrar"); 
+        var nome = document.getElementById("nome");
+        var email = document.getElementById("email");
+        var nasc = document.getElementById("nasc");
+        var tbody = document.getElementById("tbody");
+        var id = 0, trParaEditar, td, tr, tds;
+        var modalTitle = document.getElementById("modalTitle");
+        var excluirModal = document.getElementById("excluirModal");
+
+
+        //$.validator.addmethod("databr", function (value, element) {
+        //    if (!value) {
+        //        return true;
+        //    }
+
+        //    var partes = value.split("/");
+        //    if (!partes || partes.length !== 3) {
+        //        return false;
+        //    }
+
+        //    var dia = parseint(partes[0]);
+        //    var mes = parseint(partes[1]);
+        //    var ano = parseint(partes[2]);
+
+        //    if (isnan(dia) || isnan(mes) || isnan(ano) ||
+        //        dia < 1 || dia > 31 ||
+        //        mes < 1 || mes > 12 ||
+        //        ano < 1 || ano > 9999) {
+        //        return false;
+        //    }
+
+        //    switch (mes) {
+        //        case 4:
+        //        case 6:
+        //        case 9:
+        //        case 11:
+        //            if (dia > 30) {
+        //                return false;
+        //            }
+        //            break;
+        //        case 2:
+        //            if (((ano % 4 == 0) && (ano % 100 != 0)) || (ano % 400 == 0)) {
+        //                // ano bissexto
+        //                if (dia > 29) {
+        //                    return false;
+        //                }
+        //            } else {
+        //                if (dia > 28) {
+        //                    return false;
+        //                }
+        //            }
+        //            break;
+        //    }
+
+        //    return true;
+        //}, "data inválida");
+
+
+        //Click para alterar texto do botão, alterar o texto do titulo, exibir o modal e resetar os campos para preenchimento.
+        btnMostrar.onclick = function () {
+            btnSalvar.textContent = "Save"
+            modalTitle.textContent = "Novo Registro";
+
+            $("#meuModal").modal({
+                keyboard: false
+            });
+
+            nome.value = textContent = "";
+            nasc.value = textContent = "";
+            email.value = textContent = "";
+        };
+
+        //$("#nome").mask("99");
+        $("#nasc").mask("00/00/0000");
+
+        //Válidando o modal de acordo com as regras impostas
+        $("#meuForm").validate({
+            rules: {
+                nome: {
+                    required: true,
+                },
+                nasc: {
+                    required: true,
+                    date: true
+                },
+                email: {
+                    required: true,
+                    email: true
+                }
+            },
+            submitHandler: function (form) {
+                // Aqui, tudo está válido!
+                // Fazendo verificações. Se estiver Salvando, cria-se uma TR, e inseri o TR no TBody da tabela
+                if (btnSalvar.textContent === "Save") {
+                    tr = novoTr(nome, nasc, email);
+                    tbody.appendChild(tr);
+                }
+                // Fazendo verificação. Se estiver editando, os tds recebem os valores informados nos inputs
+                if (btnSalvar.textContent === "Editar") {
+                    tds[1].textContent = nome.value;
+                    tds[2].textContent = nasc.value;
+                    tds[3].textContent = email.value;
+                }
+
+                $("#meuModal").modal("hide");
+            }
+        });
+
+        // Função para criação de trs, recebendo como parâmetros os IDs dos inputs, criando variáveis locais, e retornando o TR criado
+        // e incrementado.
+        function novoTr(nome, nasc, email) {
+            var tr, td, btnEditar, btnExcluir;
+            id++;
+
+            tr = document.createElement("tr");
+
+            td = document.createElement("td");
+            td.textContent = id;
+            tr.appendChild(td);
+
+
+            td = document.createElement("td");
+            td.textContent = nome.value;
+            tr.appendChild(td);
+
+            td = document.createElement("td");
+            td.textContent = nasc.value;
+            tr.appendChild(td);
+
+            td = document.createElement("td");
+            td.textContent = email.value;
+            tr.appendChild(td);
+
+            td = document.createElement("td");
+            btnEditar = document.createElement("button");
+            btnEditar.setAttribute("type", "button");
+            btnEditar.textContent = "editar";
+            btnEditar.onclick = editarTr;
+            td.appendChild(btnEditar);
+            tr.appendChild(td);
+
+            td = document.createElement("td");
+            btnExcluir = document.createElement("button");
+            btnExcluir.setAttribute("type", "button");
+            btnExcluir.textContent = "excluir";
+            btnExcluir.onclick = excluirTr;
+            td.appendChild(btnExcluir);
+            tr.appendChild(td);
+
+            return tr;
+        }
+
+        // Função para excluir uma TR, ao clicar, abre-se o modal criado, determina o TR clicado através do dos parentNodes
+        // depois do TR encontrado, ao clicar no Botão para Excluir, remove esta TR da tabela.
+        function excluirTr() {
+            $("#meuModalExcluir").modal({
+                keyboard: false
+            });   
+            var tr = this.parentNode.parentNode;
+            excluirModal.onclick = function () {
+                tbody.removeChild(tr);
+                $("#meuModalExcluir").modal("hide");
+            }
+        }        
+
+        // Função para editar uma Tr, mudando o titulo do modal, budando o texto do botão para Editar, determinando qual
+        // tr deve ser editada, através dos parentNodes, e salvando está tr em uma variável (trParaEditar), criando um array de tds
+        // através do trParaEditar.getElementsByTagName("td");, e alterando o valor dos tds, usando o array de tds para este fim.
+        function editarTr() {
+            modalTitle.textContent = "Editando";
+            btnSalvar.textContent = "Editar";
+            trParaEditar = this.parentNode.parentNode;
+            tds = trParaEditar.getElementsByTagName("td");
+            nome.value = tds[1].textContent;
+            nasc.value = tds[2].textContent;
+            email.value = tds[3].textContent;
+            $("#meuModal").modal({
+                keyboard: false
+            });
+        }
+    </script>
+</body>
+</html>
